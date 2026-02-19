@@ -1,44 +1,44 @@
 const Countries = (() => {
   const DB = [
-    { name: 'Афганистан',          abbr: 'афг' },
-    { name: 'Алжир',               abbr: 'алж' },
-    { name: 'Бахрейн',             abbr: 'бах' },
-    { name: 'Джибути',             abbr: 'джи' },
-    { name: 'Египет',              abbr: 'еги' },
-    { name: 'Иордания',            abbr: 'иор' },
-    { name: 'Ирак',                abbr: 'ирак' },
-    { name: 'Иран',                abbr: 'иран' },
-    { name: 'Йемен',               abbr: 'йем' },
-    { name: 'Катар',               abbr: 'кат' },
-    { name: 'Кувейт',              abbr: 'кув' },
-    { name: 'Ливан',               abbr: 'лив' },
-    { name: 'Ливия',               abbr: 'ливия' },
-    { name: 'Мавритания',          abbr: 'мав' },
-    { name: 'Марокко',             abbr: 'мар' },
-    { name: 'Монголия',            abbr: 'мон' },
-    { name: 'ОАЭ',                 abbr: 'оаэ' },
-    { name: 'Оман',                abbr: 'оман' },
-    { name: 'Палестина',           abbr: 'пал' },
-    { name: 'Саудовская Аравия',   abbr: 'сау' },
-    { name: 'Сирия',               abbr: 'сир' },
-    { name: 'Судан',               abbr: 'суд' },
-    { name: 'Сомали',              abbr: 'сом' },
-    { name: 'Тунис',               abbr: 'тун' },
-    { name: 'Эфиопия',             abbr: 'эфи' },
-    { name: 'Южный Судан',         abbr: 'юж.суд' },
+    { name: 'Афганистан',          abbr: 'Афг' },
+    { name: 'Алжир',               abbr: 'Алж' },
+    { name: 'Бахрейн',             abbr: 'Бах' },
+    { name: 'Джибути',             abbr: 'Джи' },
+    { name: 'Египет',              abbr: 'Еги' },
+    { name: 'Иордания',            abbr: 'Иор' },
+    { name: 'Ирак',                abbr: 'Ирак' },
+    { name: 'Иран',                abbr: 'Иран' },
+    { name: 'Йемен',               abbr: 'Йем' },
+    { name: 'Катар',               abbr: 'Кат' },
+    { name: 'Кувейт',              abbr: 'Кув' },
+    { name: 'Ливан',               abbr: 'Ливан' },
+    { name: 'Ливия',               abbr: 'Ливия' },
+    { name: 'Мавритания',          abbr: 'Мав' },
+    { name: 'Марокко',             abbr: 'Мар' },
+    { name: 'Монголия',            abbr: 'Мон' },
+    { name: 'ОАЭ',                 abbr: 'ОАЭ' },
+    { name: 'Оман',                abbr: 'Ома' },
+    { name: 'Палестина',           abbr: 'Пал' },
+    { name: 'Саудовская Аравия',   abbr: 'Сау' },
+    { name: 'Сирия',               abbr: 'Сир' },
+    { name: 'Судан',               abbr: 'Суд' },
+    { name: 'Сомали',              abbr: 'Сом' },
+    { name: 'Тунис',               abbr: 'Тун' },
+    { name: 'Эфиопия',             abbr: 'Эфи' },
+    { name: 'Южный Судан',         abbr: 'Южн' },
   ];
 
   const nameToAbbr = new Map();
-  const abbrToName = new Map();
+  const abbrToCanonical = new Map();
   DB.forEach(c => {
     nameToAbbr.set(c.name.toLowerCase(), c.abbr);
-    abbrToName.set(c.abbr, c.name);
+    abbrToCanonical.set(c.abbr.toLowerCase(), c.abbr);
   });
 
   function getAbbr(countryName) {
     if (!countryName) return null;
     const lower = countryName.trim().toLowerCase();
-    if (abbrToName.has(lower)) return lower;
+    if (abbrToCanonical.has(lower)) return abbrToCanonical.get(lower);
     if (nameToAbbr.has(lower)) return nameToAbbr.get(lower);
 
     for (const [name, abbr] of nameToAbbr) {
