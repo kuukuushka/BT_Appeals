@@ -38,6 +38,7 @@ const Countries = (() => {
   function getAbbr(countryName) {
     if (!countryName) return null;
     const lower = countryName.trim().toLowerCase();
+    if (abbrToName.has(lower)) return lower;
     if (nameToAbbr.has(lower)) return nameToAbbr.get(lower);
 
     for (const [name, abbr] of nameToAbbr) {

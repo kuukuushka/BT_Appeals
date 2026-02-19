@@ -178,7 +178,6 @@ const Report = (() => {
         if (!abbr && customCountries[id]) {
           abbr = (country.length > 3 ? country.substring(0, 3) : country).toLowerCase();
         }
-        if (!abbr && country.length <= 6) abbr = country.toLowerCase();
         if (abbr) {
           matchingData.known.push({ id, country, abbr, catIndex: cat });
           countryCounts[abbr] = (countryCounts[abbr] || 0) + count;
