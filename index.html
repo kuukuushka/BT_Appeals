@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BT Appeals</title>
+  <link rel="stylesheet" href="css/app.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+</head>
+<body>
+  <div id="app">
+    <!-- ===== TOOLBAR ===== -->
+    <header class="toolbar">
+      <div class="toolbar__brand">BT Appeals</div>
+      <nav class="toolbar__nav">
+        <button class="toolbar__btn active" data-page="main">
+          <span class="material-icons-round">view_column</span>
+          <span class="toolbar__btn-label">Список</span>
+        </button>
+        <button class="toolbar__btn" data-page="report">
+          <span class="material-icons-round">assessment</span>
+          <span class="toolbar__btn-label">Отчет</span>
+        </button>
+        <button class="toolbar__btn" data-page="quick-report">
+          <span class="material-icons-round">flash_on</span>
+          <span class="toolbar__btn-label">Б. Отчет</span>
+        </button>
+        <button class="toolbar__btn" data-page="help">
+          <span class="material-icons-round">help_outline</span>
+          <span class="toolbar__btn-label">Справка</span>
+        </button>
+      </nav>
+      <div class="toolbar__actions">
+        <button class="toolbar__btn" id="btn-view-all" title="Просмотр категорий">
+          <span class="material-icons-round">visibility</span>
+          <span class="toolbar__btn-label">Просмотр</span>
+        </button>
+        <button class="toolbar__btn" id="btn-copy-ids" title="Копировать все ID">
+          <span class="material-icons-round">content_copy</span>
+          <span class="toolbar__btn-label">Copy ID</span>
+        </button>
+        <button class="toolbar__btn toolbar__btn--danger" id="btn-clear-all" title="Очистить">
+          <span class="material-icons-round">delete_sweep</span>
+          <span class="toolbar__btn-label">Очистить</span>
+        </button>
+        <button class="toolbar__btn" id="btn-theme" title="Тема">
+          <span class="material-icons-round">dark_mode</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- ===== NOTIFICATION CONTAINER ===== -->
+    <div class="notifications" id="notifications"></div>
+
+    <!-- ===== PAGE: MAIN (Categories) ===== -->
+    <main class="page page--main active" id="page-main">
+      <!-- Category visibility filter -->
+      <section class="cat-filter" id="cat-filter">
+        <span class="cat-filter__label">Фильтр категорий:</span>
+        <div class="cat-filter__chips" id="cat-filter-chips"></div>
+        <label class="toggle-notifications" title="Уведомления при добавлении">
+          <input type="checkbox" id="toggle-notif" checked>
+          <span class="material-icons-round">notifications</span>
+        </label>
+      </section>
+
+      <!-- Categories grid -->
+      <section class="categories-grid" id="categories-grid">
+        <!-- Generated dynamically -->
+      </section>
+    </main>
+
+    <!-- ===== PAGE: REPORT ===== -->
+    <main class="page page--report" id="page-report">
+      <section class="report-panel">
+        <div class="report-panel__actions">
+          <div class="file-drop-zone" id="file-drop-zone">
+            <span class="material-icons-round">cloud_upload</span>
+            <p>Перетащите файл сюда или</p>
+            <button class="btn btn--accent" id="btn-upload-file">Загрузить файл</button>
+            <input type="file" id="file-input" accept=".xlsx,.xls,.csv" hidden>
+          </div>
+          <div class="file-info" id="file-info" hidden>
+            <span class="material-icons-round">description</span>
+            <span class="file-info__name" id="file-name"></span>
+            <button class="btn btn--icon btn--danger-icon" id="btn-remove-file" title="Удалить файл">
+              <span class="material-icons-round">close</span>
+            </button>
+          </div>
+          <div class="report-btns">
+            <button class="btn btn--primary btn--lg" id="btn-generate-report" disabled>
+              <span class="material-icons-round">auto_awesome</span>
+              Сгенерировать отчет
+            </button>
+            <button class="btn btn--secondary" id="btn-show-matching" disabled>
+              <span class="material-icons-round">compare_arrows</span>
+              Сопоставление ID
+            </button>
+            <button class="btn btn--accent" id="btn-copy-report" disabled>
+              <span class="material-icons-round">content_copy</span>
+              Скопировать отчет
+            </button>
+          </div>
+        </div>
+        <div class="report-panel__output">
+          <label class="report-panel__output-label">Результат отчета</label>
+          <textarea class="textarea" id="report-output" placeholder="Сгенерированный отчет появится здесь..." readonly></textarea>
+        </div>
+      </section>
+    </main>
+
+    <!-- ===== PAGE: QUICK REPORT ===== -->
+    <main class="page page--quick-report" id="page-quick-report">
+      <section class="quick-report">
+        <div class="quick-report__controls">
+          <div class="quick-report__sort">
+            <button class="btn btn--ghost btn--sm" id="btn-qr-sort" title="Сортировка">
+              <span class="material-icons-round">sort</span>
+              По ID (возр.)
+            </button>
+          </div>
+          <div class="quick-report__fav-countries">
+            <button class="btn btn--ghost btn--sm" id="btn-manage-fav" title="Избранные страны">
+              <span class="material-icons-round">star</span>
+              Избранные страны
+            </button>
+          </div>
+        </div>
+        <div class="quick-report__table-wrapper">
+          <table class="data-table" id="qr-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Категория</th>
+                <th>Страна</th>
+              </tr>
+            </thead>
+            <tbody id="qr-tbody"></tbody>
+          </table>
+          <div class="quick-report__empty" id="qr-empty" hidden>
+            <span class="material-icons-round">inbox</span>
+            <p>Добавьте игроков в категории</p>
+          </div>
+        </div>
+        <div class="quick-report__result">
+          <button class="btn btn--primary btn--lg btn--full" id="btn-qr-generate">
+            <span class="material-icons-round">auto_awesome</span>
+            Сгенерировать и скопировать
+          </button>
+          <textarea class="textarea" id="qr-output" placeholder="Результат быстрого отчета..." readonly></textarea>
+        </div>
+      </section>
+    </main>
+
+    <!-- ===== PAGE: HELP ===== -->
+    <main class="page page--help" id="page-help">
+      <div class="help-cards">
+
+        <div class="help-card">
+          <div class="help-card__icon" style="background:var(--primary-bg);color:var(--primary)"><span class="material-icons-round">view_column</span></div>
+          <h3>Блок категорий — добавление ID</h3>
+          <p>4 категории: <b>Коллеги, Агенты, Консультант, Тикеты</b>. В каждой есть поле ввода:</p>
+          <ul>
+            <li>Вставьте ID через <kbd>Ctrl+V</kbd> — добавится мгновенно</li>
+            <li>Напечатайте и нажмите <kbd>Enter</kbd></li>
+            <li>Несколько ID сразу — через пробел, запятую, точку с запятой</li>
+            <li>Принимаются <b>только цифры</b>, посторонние символы блокируются</li>
+            <li>Одинаковые ID в списке допустимы — каждый учитывается как +1 обращение</li>
+          </ul>
+          <div class="help-step"><span class="help-step__num">!</span><span class="help-step__text">Уведомления отображаются под меню, поверх всех блоков. При добавлении ID появляется плашка с названием категории.</span></div>
+        </div>
+
+        <div class="help-card">
+          <div class="help-card__icon" style="background:var(--secondary-bg);color:var(--secondary)"><span class="material-icons-round">tune</span></div>
+          <h3>Фильтр, порядок и управление</h3>
+          <p>Панель фильтров над категориями:</p>
+          <ul>
+            <li>Нажмите на чип категории чтобы <b>скрыть/показать</b> её колонку</li>
+            <li>Нельзя скрыть все сразу — минимум одна всегда видна</li>
+            <li><b>Перетащите</b> заголовок колонки чтобы изменить порядок</li>
+            <li>Фильтр автоматически меняет порядок вслед за колонками</li>
+          </ul>
+          <p>Управление игроками в списке (наведите на строку):</p>
+          <ul>
+            <li><span class="material-icons-round" style="font-size:14px;vertical-align:middle">drive_file_move</span> — перенести в другую категорию (с подтверждением)</li>
+            <li><span class="material-icons-round" style="font-size:14px;vertical-align:middle">close</span> — удалить (с подтверждением и указанием категории)</li>
+          </ul>
+        </div>
+
+        <div class="help-card">
+          <div class="help-card__icon" style="background:var(--accent-bg);color:var(--accent)"><span class="material-icons-round">visibility</span></div>
+          <h3>Кнопка «Просмотр» — общий список</h3>
+          <p>Открывает окно со всеми ID из всех категорий. Возможности:</p>
+          <ul>
+            <li>Поиск по ID</li>
+            <li>Фильтрация по категориям</li>
+            <li>Отображение времени добавления</li>
+            <li>Удаление одного или нескольких (выберите галочкой)</li>
+            <li>Перенос одного или нескольких в другую категорию</li>
+          </ul>
+        </div>
+
+        <div class="help-card">
+          <div class="help-card__icon" style="background:var(--primary-bg);color:var(--primary)"><span class="material-icons-round">content_copy</span></div>
+          <h3>Кнопка «Copy ID»</h3>
+          <p>Копирует все <b>уникальные</b> ID из всех категорий в буфер обмена — по одному на строку. Используйте это для поиска игроков в веб-системе перед генерацией отчёта.</p>
+          <div class="help-step"><span class="help-step__num">1</span><span class="help-step__text">Нажмите Copy ID → вставьте в поиск → скачайте таблицу .xlsx</span></div>
+          <div class="help-step"><span class="help-step__num">2</span><span class="help-step__text">Загрузите файл в раздел «Отчет» → нажмите «Сгенерировать отчет»</span></div>
+        </div>
+
+        <div class="help-card">
+          <div class="help-card__icon" style="background:var(--primary-bg);color:var(--primary)"><span class="material-icons-round">assessment</span></div>
+          <h3>Отчет — генерация по файлу</h3>
+          <p>Раздел <b>Отчет</b>:</p>
+          <ul>
+            <li>Загрузите файл (кнопка или перетаскивание .xlsx/.xls/.csv), используется <b>первый лист</b> файла</li>
+            <li>Нажмите <span class="help-badge help-badge--primary">Сгенерировать отчет</span>, затем <span class="help-badge help-badge--accent">Скопировать отчет</span></li>
+            <li>Колонка ID ищется по заголовку <b>ID</b> (иначе берется колонка A), колонка страны — по заголовку с <b>стран</b> или <b>country</b> (иначе колонка F)</li>
+            <li>В отчёт попадают <b>только известные</b> страны (из базы). Неизвестные страны и ID, не найденные в файле, в отчёт <b>не добавляются</b> — откройте <b>Сопоставление ID</b>, укажите страну и нажмите «Применить»</li>
+          </ul>
+          <p style="margin-top:8px"><b>Формат результата:</b></p>
+          <pre style="background:var(--bg);padding:8px 12px;border-radius:var(--radius-sm);font-size:var(--fs-xs);line-height:1.8;overflow-x:auto">Обращений агентов:
+алж:1
+еги:15
+мар:6</pre>
+        </div>
+
+        <div class="help-card">
+          <div class="help-card__icon" style="background:var(--warning-bg);color:var(--warning)"><span class="material-icons-round">compare_arrows</span></div>
+          <h3>Сопоставление ID в отчёте</h3>
+          <p>Кнопка <span class="help-badge help-badge--secondary">Сопоставление ID</span> доступна после генерации отчёта.</p>
+          <ul>
+            <li><b style="color:var(--danger)">ID не найдены в файле</b> — введите полное название и/или сокращение, нажмите «Применить». ID исчезнет из проблемного списка и попадёт в «Все сопоставления»</li>
+            <li><b style="color:var(--warning)">Неизвестные страны</b> — можно оставить значение из файла или заменить своим и нажать «Применить»</li>
+            <li>Списки проблем показывают <b>уникальные ID</b> (без дублей), а справа может быть сразу несколько категорий для одного ID</li>
+            <li>Для одного ID хранится <b>одна страна</b>: если ID встречается в нескольких категориях, применённое значение используется для всех его вхождений</li>
+            <li><b style="color:var(--success)">Все сопоставления</b> — успешно сопоставленные ID с категорией справа. После «Применить» список пересчитывается и обновляется автоматически</li>
+          </ul>
+          <div class="help-step"><span class="help-step__num">!</span><span class="help-step__text">Рекомендуется вводить первые 3 буквы страны. После «Применить» изменения сразу попадают в отчёт.</span></div>
+        </div>
+
+        <div class="help-card">
+          <div class="help-card__icon" style="background:var(--accent-bg);color:var(--accent)"><span class="material-icons-round">flash_on</span></div>
+          <h3>Быстрый отчёт</h3>
+          <p>Работает без загрузки файла — страну для каждого ID выбираете вручную:</p>
+          <ul>
+            <li>В таблице отображаются все ID из категорий; если списков пуст — показывается подсказка «Добавьте игроков в категории»</li>
+            <li>Страна: выбор из списка (избранные отображаются первыми) или ввод вручную (рекомендуется 3 буквы)</li>
+            <li>Избранные страны настраиваются в окне «Избранные страны» и сразу отображаются в выпадающих списках без перезагрузки</li>
+            <li>Сортировка: по ID (возр./убыв.) или по категории</li>
+            <li>Кнопка <span class="help-badge help-badge--primary">Сгенерировать и скопировать</span> формирует отчёт и копирует его в буфер</li>
+          </ul>
+        </div>
+
+        <div class="help-card">
+          <div class="help-card__icon" style="background:var(--danger-bg);color:var(--danger)"><span class="material-icons-round">delete_sweep</span></div>
+          <h3>Кнопка «Очистить»</h3>
+          <p>Очищает все ID из всех категорий с подтверждением. <b>Сохраняются:</b></p>
+          <ul>
+            <li>Избранные страны (Быстрый отчет)</li>
+            <li>Скрытые категории (фильтр)</li>
+            <li>Порядок расположения категорий</li>
+            <li>Выбранная тема (светлая/тёмная)</li>
+          </ul>
+          <p style="margin-top:8px;color:var(--text-2)">Сопоставления стран, временные данные отчёта и состояние уведомлений сбрасываются.</p>
+        </div>
+
+        <div class="help-card">
+          <div class="help-card__icon" style="background:var(--success-bg);color:var(--success)"><span class="material-icons-round">security</span></div>
+          <h3>Защита от ошибок</h3>
+          <ul>
+            <li>Удаления и переносы выполняются <b>с подтверждением</b></li>
+            <li>Только числовые ID — буквы и спецсимволы блокируются</li>
+            <li>Уведомление при добавлении с цветом категории (можно отключить колокольчиком в фильтре)</li>
+            <li>Данные <b>сохраняются в браузере</b> — не теряются при перезагрузке страницы</li>
+            <li>Нельзя скрыть все категории одновременно</li>
+          </ul>
+        </div>
+
+        <div class="help-card">
+          <div class="help-card__icon" style="background:var(--secondary-bg);color:var(--secondary)"><span class="material-icons-round">rule</span></div>
+          <h3>Нюансы и ограничения</h3>
+          <ul>
+            <li>В отчёте учитывается только первый лист файла и только те строки, где после очистки ID остаются цифры</li>
+            <li>Если в категориях один и тот же ID добавлен несколько раз, в отчёте это считается как несколько обращений (+1 за каждое вхождение)</li>
+            <li>Копирование в буфер зависит от прав браузера: если доступ запрещён, копируйте текст вручную из поля отчёта</li>
+            <li>Все данные хранятся локально в браузере (localStorage): в другом браузере/профиле/инкогнито данные не переносятся</li>
+            <li>В быстром отчёте кнопка «Сгенерировать и скопировать» сразу делает оба действия, а в разделе «Отчет» действия разделены на две кнопки</li>
+          </ul>
+        </div>
+
+      </div>
+    </main>
+
+    <!-- ===== MODAL: VIEW ALL ===== -->
+    <div class="modal-overlay" id="modal-view-all">
+      <div class="modal modal--lg">
+        <div class="modal__header">
+          <h3>Просмотр категорий</h3>
+          <button class="btn btn--icon modal__close" data-close-modal="modal-view-all">
+            <span class="material-icons-round">close</span>
+          </button>
+        </div>
+        <div class="modal__toolbar">
+          <div class="modal__search">
+            <span class="material-icons-round">search</span>
+            <input type="text" id="view-all-search" placeholder="Поиск по ID...">
+          </div>
+          <div class="modal__filter-chips" id="view-all-filter"></div>
+        </div>
+        <div class="modal__body">
+          <table class="data-table" id="view-all-table">
+            <thead>
+              <tr>
+                <th><input type="checkbox" id="view-all-select-all"></th>
+                <th>ID</th>
+                <th>Категория</th>
+                <th>Добавлен</th>
+                <th>Действия</th>
+              </tr>
+            </thead>
+            <tbody id="view-all-tbody"></tbody>
+          </table>
+        </div>
+        <div class="modal__footer">
+          <button class="btn btn--danger btn--sm" id="btn-view-all-delete" disabled>
+            <span class="material-icons-round">delete</span> Удалить выбранные
+          </button>
+          <button class="btn btn--secondary btn--sm" id="btn-view-all-move" disabled>
+            <span class="material-icons-round">drive_file_move</span> Перенести выбранные
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== MODAL: MATCHING ===== -->
+    <div class="modal-overlay" id="modal-matching">
+      <div class="modal modal--lg">
+        <div class="modal__header">
+          <h3>Сопоставление ID в отчете</h3>
+          <button class="btn btn--icon modal__close" data-close-modal="modal-matching">
+            <span class="material-icons-round">close</span>
+          </button>
+        </div>
+        <div class="modal__body modal__body--matching">
+          <!-- Not found section -->
+          <div class="matching-section matching-section--error" id="matching-notfound" hidden>
+            <h4><span class="material-icons-round">search_off</span> ID не найдены в файле</h4>
+            <table class="data-table data-table--error">
+              <thead><tr><th>ID</th><th>Категория</th><th>Страна (полное название + сокращение)</th><th>Действие</th></tr></thead>
+              <tbody id="matching-notfound-tbody"></tbody>
+            </table>
+          </div>
+          <!-- Unknown countries section -->
+          <div class="matching-section matching-section--warning" id="matching-unknown" hidden>
+            <h4><span class="material-icons-round">warning</span> Неизвестные страны</h4>
+            <table class="data-table data-table--warning">
+              <thead><tr><th>ID</th><th>Страна</th><th>Категория</th><th>Сокращение / Применить</th></tr></thead>
+              <tbody id="matching-unknown-tbody"></tbody>
+            </table>
+          </div>
+          <!-- Known countries section -->
+          <div class="matching-section">
+            <h4><span class="material-icons-round">check_circle</span> Все сопоставления</h4>
+            <table class="data-table">
+              <thead><tr><th>ID</th><th>Страна</th><th>Сокращение</th><th>Категория</th></tr></thead>
+              <tbody id="matching-known-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== MODAL: CONFIRM ===== -->
+    <div class="modal-overlay" id="modal-confirm">
+      <div class="modal modal--sm">
+        <div class="modal__header">
+          <h3 id="confirm-title">Подтверждение</h3>
+          <button class="btn btn--icon modal__close" data-close-modal="modal-confirm">
+            <span class="material-icons-round">close</span>
+          </button>
+        </div>
+        <div class="modal__body">
+          <p id="confirm-message"></p>
+        </div>
+        <div class="modal__footer">
+          <button class="btn btn--ghost" data-close-modal="modal-confirm">Отмена</button>
+          <button class="btn btn--danger" id="confirm-ok">Подтвердить</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== MODAL: MOVE TO CATEGORY ===== -->
+    <div class="modal-overlay" id="modal-move">
+      <div class="modal modal--sm">
+        <div class="modal__header">
+          <h3>Перенести в категорию</h3>
+          <button class="btn btn--icon modal__close" data-close-modal="modal-move">
+            <span class="material-icons-round">close</span>
+          </button>
+        </div>
+        <div class="modal__body">
+          <p id="move-message"></p>
+          <div class="move-options" id="move-options"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== MODAL: FAVORITE COUNTRIES ===== -->
+    <div class="modal-overlay" id="modal-fav-countries">
+      <div class="modal modal--sm">
+        <div class="modal__header">
+          <h3>Избранные страны</h3>
+          <button class="btn btn--icon modal__close" data-close-modal="modal-fav-countries">
+            <span class="material-icons-round">close</span>
+          </button>
+        </div>
+        <div class="modal__body">
+          <p class="modal__hint">Отметьте страны, которые будут отображаться первыми при выборе.</p>
+          <div class="fav-countries-list" id="fav-countries-list"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/countries.js"></script>
+  <script src="js/notifications.js"></script>
+  <script src="js/categories.js"></script>
+  <script src="js/report.js"></script>
+  <script src="js/quick-report.js"></script>
+  <script src="js/modals.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
