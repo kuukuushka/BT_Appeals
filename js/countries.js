@@ -29,9 +29,21 @@ const Countries = (() => {
   ];
 
   const nameToAbbr = new Map();
+  const normalizedNameToAbbr = new Map();
   const abbrToCanonical = new Map();
+  function normalize(value) {
+    return String(value || '')
+      .trim()
+      .toLowerCase()
+      .replace(/ё/g, 'е')
+      .replace(/[^0-9a-zа-я]+/gi, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
   DB.forEach(c => {
     nameToAbbr.set(c.name.toLowerCase(), c.abbr);
+    normalizedNameToAbbr.set(normalize(c.name), c.abbr);
     abbrToCanonical.set(c.abbr.toLowerCase(), c.abbr);
   });
 
@@ -41,9 +53,18 @@ const Countries = (() => {
     if (abbrToCanonical.has(lower)) return abbrToCanonical.get(lower);
     if (nameToAbbr.has(lower)) return nameToAbbr.get(lower);
 
-    for (const [name, abbr] of nameToAbbr) {
-      if (lower.includes(name) || name.includes(lower)) return abbr;
+    const normalized = normalize(countryName);
+    if (!normalized) return null;
+
+    if (normalizedNameToAbbr.has(normalized)) {
+      return normalizedNameToAbbr.get(normalized);
     }
+
+    const padded = ` ${normalized} `;
+    for (const [nameNorm, abbr] of normalizedNameToAbbr) {
+      if (padded.includes(` ${nameNorm} `)) return abbr;
+    }
+
     return null;
   }
 
