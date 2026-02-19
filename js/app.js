@@ -73,16 +73,21 @@ function initToolbarActions() {
     }
     Modals.confirm(
       'Очистить все данные',
-      `Удалить все <b>${total}</b> ID из всех категорий?<br><br>
-       <span style="color:var(--text-2);font-size:var(--fs-xs)">
-         Сохранятся: избранные страны, скрытые категории, порядок категорий, тема.
-       </span>`,
+       `Удалить все <b>${total}</b> ID из всех категорий?<br><br>
+        <span style="color:var(--text-2);font-size:var(--fs-xs)">
+          Сохранятся: избранные страны, скрытые категории, порядок категорий, тема, состояние уведомлений.
+        </span>`,
       () => {
-        // Wipe everything except the 4 preserved settings
+        // Wipe everything except preserved settings
         Storage.clearUserData();
         // Re-init categories from fresh storage (empty arrays)
         Categories.init();
+        if (typeof Report !== 'undefined' && typeof Report.reset === 'function') {
+          Report.reset();
+        }
         QuickReport.refresh();
+        const notifToggle = document.getElementById('toggle-notif');
+        if (notifToggle) notifToggle.checked = Storage.getNotifEnabled();
         Notifications.success('Все данные очищены');
       }
     );

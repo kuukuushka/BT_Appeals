@@ -86,22 +86,23 @@ const Storage = (() => {
     set(KEYS.CUSTOM_COUNTRIES, map);
   }
 
-  // Clears all app data EXCEPT: favourite countries, hidden cats, cat order, theme.
-  // Notifications toggle is also wiped (it's a preference tied to session, not permanent config).
+  // Clears all app data EXCEPT: favourite countries, hidden cats, cat order, theme, notifications toggle.
   function clearUserData() {
     const favCountries = getFavCountries();
     const catOrder = getCategoryOrder();
     const hiddenCats = getHiddenCats();
     const theme = getTheme();
+    const notifEnabled = getNotifEnabled();
 
     // Wipe every key that belongs to this app
     Object.values(KEYS).forEach(k => remove(k));
 
-    // Restore the four preserved settings
+    // Restore preserved settings
     setFavCountries(favCountries);
     setCategoryOrder(catOrder);
     setHiddenCats(hiddenCats);
     setTheme(theme);
+    setNotifEnabled(notifEnabled);
   }
 
   return {

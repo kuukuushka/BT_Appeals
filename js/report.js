@@ -237,5 +237,9 @@ const Report = (() => {
     return uploadedData;
   }
 
-  return { init, getUploadedData, generateReport, getLastMatching };
+  function reset() {
+    removeFile();
+  }
+
+  return { init, getUploadedData, generateReport, getLastMatching, reset };
 })();
